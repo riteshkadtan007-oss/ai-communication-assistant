@@ -28,8 +28,9 @@ source.exclude_dirs = tests, bin, venv, .venv, __pycache__, .git, .idea, .vscode
 version = 0.1.0
 
 # (list) Application requirements
-# Pin versions known to play nice with python-for-android.
-requirements = python3,kivy==2.3.0,requests,urllib3,certifi,chardet,idna,charset-normalizer,openssl,pyjnius
+# Keep this minimal — p4a auto-pulls the right transitive deps for `requests`.
+# Adding too many explicit deps causes "no recipe found" failures.
+requirements = python3,kivy==2.3.0,requests,openssl
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -63,19 +64,28 @@ android.minapi = 21
 # (int) Android NDK API to use. This is the minimum API your app will support.
 android.ndk_api = 21
 
+# (str) Pin NDK to a version known-stable with python-for-android.
+# Auto-downloading the latest NDK (e.g. r28c) often breaks the toolchain.
+android.ndk = 25b
+
 # (bool) If True, then automatically accept SDK license
 # agreements. This is intended for automation only. If set to False,
 # the default, you will be shown the license when first running buildozer.
 android.accept_sdk_license = True
 
-# (list) The Android archs to build for
-android.archs = arm64-v8a, armeabi-v7a
+# (list) The Android archs to build for.
+# Build only arm64-v8a first — covers ~95% of modern Android phones and halves build time.
+# Add armeabi-v7a back later if you need to support older devices.
+android.archs = arm64-v8a
 
 # (bool) enables Android auto backup feature (Android API >=23)
 android.allow_backup = True
 
-# (str) python-for-android branch to use, defaults to master
-p4a.branch = master
+# (str) python-for-android branch to use.
+# Pinned to v2024.01.21 — this release defaults to Python 3.11, which Kivy 2.3.0
+# was built and tested against. Master defaults to Python 3.14, which breaks
+# Kivy's C extensions (Py_UNICODE removed, _PyLong_AsByteArray signature changed).
+p4a.branch = v2024.01.21
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
 #p4a.source_dir =
