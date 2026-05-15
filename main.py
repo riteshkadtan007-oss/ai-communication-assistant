@@ -25,7 +25,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
-from kivy.utils import get_color_from_hex
+from kivy.utils import get_color_from_hex, platform
 
 import config
 from gemini_client import GeminiClient, GeminiError
@@ -259,6 +259,10 @@ class HomeScreen(Screen):
         return self.status_label
 
     def _build_result_section(self):
+        # size_hint_y=1 makes the result box absorb whatever vertical space
+        # is left after the fixed-height widgets above it. On a tall phone
+        # this means lots of room for long AI responses. On Mac with the
+        # forced 420x760 window, it ends up ~120dp tall — same as before.
         self.result_box = TextInput(
             hint_text="AI result will appear here...",
             hint_text_color=clr(TEXT_GRAY),
@@ -266,7 +270,7 @@ class HomeScreen(Screen):
             background_color=clr(BG_CARD),
             font_size=dp(14),
             padding=[dp(14), dp(12), dp(14), dp(12)],
-            size_hint_y=None, height=dp(120),
+            size_hint_y=1,
             multiline=True, readonly=True,
         )
         return self.result_box
@@ -598,9 +602,12 @@ class AIKeyboardApp(App):
 
     def build(self):
         Window.clearcolor = clr(BG_DARK)
-        # Phone-ish aspect on Mac, so the layout previews what it'll feel
-        # like on Android later.
-        Window.size = (420, 760)
+        # On desktop (Mac/Windows/Linux), force a phone-ish window so the
+        # layout looks like it will on Android. On real phones, let the OS
+        # fill the screen — hardcoding Window.size on Android creates a
+        # small viewport in the corner with black space around it.
+        if platform not in ("android", "ios"):
+            Window.size = (420, 760)
 
         # Single shared client — both screens see/update the same key.
         self.gemini = GeminiClient(
