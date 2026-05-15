@@ -1,0 +1,33 @@
+# Virtual environment — huge and machine-specific, never push
+.venv/
+venv/
+env/
+
+# Python bytecode / caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Buildozer / Android build artifacts (will exist after Android build step)
+.buildozer/
+bin/
+
+# IDE / editor noise
+.vscode/
+.idea/
+*.swp
+.spyproject/
+
+# macOS noise
+.DS_Store
+
+# Local API key file (in case we ever store one in-repo by accident)
+config.json
+*.local
+
+# OS / package noise
+*.log
+*.egg-info/
+dist/
+build/
